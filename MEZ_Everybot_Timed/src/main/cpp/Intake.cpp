@@ -12,7 +12,8 @@ Intake::Intake() {
 
 void Intake::Init() {
     // possibly reset encoder for arm motor
-
+    IntakeStop();
+    ArmHold();
 }
 
 void Intake::Periodic() {
@@ -20,12 +21,16 @@ void Intake::Periodic() {
     
 }
 
-void Intake::Dump() {
+void Intake::IntakeDump() {
     m_intakeMotor->Set(-MOTOR_SPEEDS::INTAKE_SPEED);
 }
 
-void Intake::Grab() {
+void Intake::IntakeGrab() {
     m_intakeMotor->Set(MOTOR_SPEEDS::INTAKE_SPEED);
+}
+
+void Intake::IntakeStop() {
+    m_intakeMotor->Set(0);
 }
 
 void Intake::ArmUp() {

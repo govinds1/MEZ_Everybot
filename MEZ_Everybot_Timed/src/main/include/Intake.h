@@ -15,8 +15,9 @@ class Intake {
     void Init();
     void Periodic();
 
-    void Dump();
-    void Grab();
+    void IntakeDump();
+    void IntakeGrab();
+    void IntakeStop();
 
     void ArmUp();
     void ArmDown();

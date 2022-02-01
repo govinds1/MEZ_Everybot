@@ -23,11 +23,11 @@ Drive::Drive() {
 }
 
 void Drive::Init() {
-
+    ArcadeDrive(0, 0);
 }
 
 void Drive::Periodic() {
-
+    
 }
 
 void Drive::TankDrive(double left, double right) {

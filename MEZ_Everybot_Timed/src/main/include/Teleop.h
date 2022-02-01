@@ -6,7 +6,7 @@
 
 class Teleop {
     public:
-    Teleop();
+    Teleop(Drive* drive, Intake* intake);
 
     frc::XboxController* m_controller1;
     Drive* m_drive;

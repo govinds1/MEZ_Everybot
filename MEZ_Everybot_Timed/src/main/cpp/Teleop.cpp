@@ -1,5 +1,7 @@
 #include "Teleop.h"
 
+// ALL Teleop control of subsystems should be handled here
+
 Teleop::Teleop(Drive* drive, Intake* intake): m_drive(drive), m_intake(intake)  {
     m_controller1 = new frc::XboxController(CONTROLLER_CONFIG::CONTROLLER1_PORT);
 }

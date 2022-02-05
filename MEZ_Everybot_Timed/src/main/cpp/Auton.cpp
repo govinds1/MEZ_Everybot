@@ -1,24 +1,24 @@
 #include "Auton.h"
 
 Auton::Auton(Drive* drive, Intake* intake): m_drive(drive), m_intake(intake) {
-    for (std::string option : kAutoNames) {
-        if (option == "Idle") {
-            m_chooser.SetDefaultOption(option, option);
-        } else {
-            m_chooser.AddOption(option, option);
-        }
-    }
-    frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
+    // for (std::string option : kAutoNames) {
+    //     if (option == "Idle") {
+    //         m_chooser.SetDefaultOption(option, option);
+    //     } else {
+    //         m_chooser.AddOption(option, option);
+    //     }
+    // }
+    // frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
+
+    frc::SmartDashboard::PutStringArray("Auto List", kAutoNames);
 }
 
 void Auton::Init() {
     m_drive->Init();
     m_intake->Init();
 
-    // comment out chooser line and uncomment dashboard GetString if you use the LabVIEW dashboard to select Auton
-    m_autonSelectedString = m_chooser.GetSelected();
-    // m_autoSelected = SmartDashboard::GetString("Auto Selector",
-    //     kAutoNameDefault);
+    // Get selected Auton, with default if none selected
+    m_autonSelectedString = frc::SmartDashboard::GetString("Auto Selector", "Idle");
     fmt::print("Auton selected: {}\n", m_autonSelectedString);
 
     m_autonSelectedNumber = 0;
@@ -47,6 +47,7 @@ void Auton::Periodic() {
             DumpAndTaxi_Auton();
             break;
         default:
+            m_autonSelectedNumber = 0;
             Idle_Auton();
             break;
     }
@@ -80,7 +81,7 @@ void Auton::Idle_Auton() {
 
 void Auton::Taxi_Auton() {
     switch(currentState) {
-        case 0:
+        case 0: // Drive backwards
             m_drive->ArcadeDrive(-0.5, 0);
             StopSubsystems(false, true, true);
             // use distance checks with the drive encoders, but using Timer for now
@@ -88,7 +89,7 @@ void Auton::Taxi_Auton() {
                 GoToNextState();
             }
             break;
-        case 1:
+        case 1: // Stop all motors
             StopSubsystems(true, true, true);
             break;
         default:
@@ -99,14 +100,14 @@ void Auton::Taxi_Auton() {
 
 void Auton::DumpAndTaxi_Auton() {
     switch(currentState) {
-        case 0:
+        case 0: // Dump ball
             m_intake->IntakeDump();
             StopSubsystems(true, true, false);
             if (GetTime() - stateStart >= 3) {
                 GoToNextState();
             }
             break;
-        case 1:
+        case 1: // Drive backwards
             m_drive->ArcadeDrive(-0.5, 0);
             StopSubsystems(false, true, true);
 
@@ -115,7 +116,7 @@ void Auton::DumpAndTaxi_Auton() {
                 GoToNextState();
             }
             break;
-        case 2:
+        case 2: // Stop all motors
             StopSubsystems(true, true, true);
             break;
         default:

@@ -19,6 +19,7 @@ class Auton {
     void Idle_Auton();
     void Taxi_Auton();
     void DumpAndTaxi_Auton();
+    // add more
 
     Drive* m_drive;
     Intake* m_intake;
@@ -34,7 +35,7 @@ class Auton {
     int currentState;
     double stateStart;
     frc::Timer timer;
-    //const std::string kAutoNameDefault = "Default";
-    //const std::string kAutoNameCustom = "My Auto";
+
+    // Update this vector when you add more routines
     const std::vector<std::string> kAutoNames{"Idle", "Taxi", "DumpAndTaxi"};
 };

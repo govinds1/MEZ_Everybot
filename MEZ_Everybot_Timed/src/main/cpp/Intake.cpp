@@ -13,6 +13,8 @@ Intake::Intake() {
     //m_armMotor->SetSoftLimit(rev::CANSparkMax::SoftLimitDirection::kReverse, armUpPos);
     //m_armMotor->SetSoftLimit(rev::CANSparkMax::SoftLimitDirection::kForward, armDownPos);
 
+    m_armMotor->GetEncoder().SetPositionConversionFactor(1.0);
+
     frc::SmartDashboard::PutNumber("Subsystems/Arm/Position", GetArmPosition());
     frc::SmartDashboard::PutBoolean("Subsystems/Arm/Holding", holding);
     frc::SmartDashboard::PutBoolean("Subsystems/Arm/HoldPos", holdPos);

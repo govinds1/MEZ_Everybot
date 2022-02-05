@@ -29,7 +29,7 @@ void Auton::Init() {
             m_autonSelectedNumber++;
         }
     }
-    currentState = 0.0;
+    currentState = 0;
     stateStart = GetTime();
 }
 
@@ -57,7 +57,7 @@ double Auton::GetTime() {
 }
 
 void Auton::GoToNextState() {
-    // reset encoders possibly
+    m_drive->ResetPosition();
     stateStart = 0.0;
     currentState++;
 }
@@ -109,6 +109,7 @@ void Auton::DumpAndTaxi_Auton() {
         case 1:
             m_drive->ArcadeDrive(-0.5, 0);
             StopSubsystems(false, true, true);
+
             // use distance checks with the drive encoders, but using Timer for now
             if (GetTime() - stateStart >= 5.0) {
                 GoToNextState();

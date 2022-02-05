@@ -4,20 +4,31 @@ Intake::Intake() {
     m_armMotor = new rev::CANSparkMax(CAN_IDs::ARM_MOTOR, rev::CANSparkMaxLowLevel::MotorType::kBrushless);
     m_intakeMotor = new WPI_VictorSPX(CAN_IDs::INTAKE_MOTOR);
 
+    m_armMotor->SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
     m_armMotor->SetInverted(false);
     m_intakeMotor->SetInverted(false);
 
+    ArmConfigPID(0.0, 0.0, 0.0);
     // set soft limits for arm motor to armUpPos and armDownPos
+    //m_armMotor->SetSoftLimit(rev::CANSparkMax::SoftLimitDirection::kReverse, armUpPos);
+    //m_armMotor->SetSoftLimit(rev::CANSparkMax::SoftLimitDirection::kForward, armDownPos);
+
+    frc::SmartDashboard::PutNumber("Subsystems/Arm/Position", GetArmPosition());
+    frc::SmartDashboard::PutBoolean("Subsystems/Arm/Holding", holding);
+    frc::SmartDashboard::PutBoolean("Subsystems/Arm/HoldPos", holdPos);
 }
 
 void Intake::Init() {
-    // possibly reset encoder for arm motor
+    holding = false;
     IntakeStop();
     ArmHold();
 }
 
 void Intake::Periodic() {
     // push current encoder value to SmartDashboard
+    frc::SmartDashboard::PutNumber("Subsystems/Arm/Position", GetArmPosition());
+    frc::SmartDashboard::PutBoolean("Subsystems/Arm/Holding", holding);
+    frc::SmartDashboard::PutBoolean("Subsystems/Arm/HoldPos", holdPos);
     
 }
 
@@ -36,17 +47,45 @@ void Intake::IntakeStop() {
 void Intake::ArmUp() {
     // use setpoints if possible, otherwise just Set(arm speed)
     // set position setpoint to be some predetermined encoder value for up
+    //m_armEncoder.SetPosition(armUpPos);
+
     m_armMotor->Set(MOTOR_SPEEDS::ARM_SPEED);
+
 }
 
 void Intake::ArmDown() {
     // use setpoints if possible, otherwise just Set(-arm speed)
     // set position setpoint to be some predetermined encoder value for down
+    //m_armEncoder.SetPosition(armDownPos);
+
     m_armMotor->Set(-MOTOR_SPEEDS::ARM_SPEED);
 }
 
 void Intake::ArmHold() {
     // use setpoints if possible, otherwise just Set(0)
     // for hold setpoint, just get current encoder value and set that as position setpoint
+    // if (!holding) {
+    //     holdPos = GetArmPosition();
+    //     holding = true;
+    // }
+    // SetArmPosition(holdPos);
+
     m_armMotor->Set(0);
+}
+
+void Intake::ArmConfigPID(double kP, double kI, double kD) {
+    auto m_armPIDController = m_armMotor->GetPIDController();
+    m_armPIDController.SetP(kP);
+    m_armPIDController.SetI(kI);
+    m_armPIDController.SetD(kD);
+}
+
+double Intake::GetArmPosition() {
+    // do any conversions if needed
+    return m_armMotor->GetEncoder().GetPosition();
+}
+
+void Intake::SetArmPosition(double setpoint) {
+    // do any conversions if needed
+    m_armMotor->GetEncoder().SetPosition(setpoint);
 }

@@ -22,8 +22,13 @@ class Intake {
     void ArmUp();
     void ArmDown();
     void ArmHold();
+    void ArmConfigPID(double kP, double kI, double kD);
+    double GetArmPosition();
+    void SetArmPosition(double setpoint);
 
     private:
+    bool holding = false;
+    double holdPos = 0;
 
     const double armUpPos = 0; // CHANGE FROM TESTING
     const double armDownPos = 0; // CHANGE FROM TESTING

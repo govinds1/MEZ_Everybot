@@ -17,7 +17,9 @@ class Auton {
 
     // Auton functions
     void Idle_Auton();
-    void Taxi_Auton();
+    void Taxi_Auton_Timed();
+    void Taxi_Auton_PID();
+    void Taxi_Auton_DistCheck();
     void DumpAndTaxi_Auton();
     // add more
 
@@ -29,11 +31,12 @@ class Auton {
     void StopSubsystems(bool drive, bool arm, bool intake);
 
     private:
-    frc::SendableChooser<std::string> m_chooser;
+    //frc::SendableChooser<std::string> m_chooser;
     std::string m_autonSelectedString;
     int m_autonSelectedNumber;
     int currentState;
-    double stateStart;
+    double stateStartTime;
+    double stateStartPos;
     frc::Timer timer;
 
     // Update this vector when you add more routines

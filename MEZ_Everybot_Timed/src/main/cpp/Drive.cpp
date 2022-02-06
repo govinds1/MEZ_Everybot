@@ -1,6 +1,7 @@
 #include "Drive.h"
 
 Drive::Drive() {
+    // MEZ Everybot uses NEOs on the drivetrain
     m_leftFrontMotor = new rev::CANSparkMax(CAN_IDs::LEFTFRONT_MOTOR, rev::CANSparkMaxLowLevel::MotorType::kBrushless);
     m_leftRearMotor = new rev::CANSparkMax(CAN_IDs::LEFTREAR_MOTOR, rev::CANSparkMaxLowLevel::MotorType::kBrushless);
     m_rightFrontMotor = new rev::CANSparkMax(CAN_IDs::RIGHTFRONT_MOTOR, rev::CANSparkMaxLowLevel::MotorType::kBrushless);
@@ -24,6 +25,9 @@ Drive::Drive() {
     // use counts per revolution and the wheel circumference to get conversion factor from encoder units to feet
     m_leftFrontMotor->GetEncoder().SetPositionConversionFactor(1.0);
     m_rightFrontMotor->GetEncoder().SetPositionConversionFactor(1.0);
+
+    ConfigPID(m_leftFrontMotor, 0.0, 0.0, 0.0);
+    ConfigPID(m_rightFrontMotor, 0.0, 0.0, 0.0);
 
     ResetPosition();
 
@@ -52,7 +56,7 @@ void Drive::ArcadeDrive(double speed, double rot) {
 }
 
 double Drive::GetPosition() {
-    //some average of the front encoders
+    // average of the front encoders
     return (GetLeftPosition() + GetRightPosition())/2.0;
 }
 
@@ -67,4 +71,33 @@ double Drive::GetRightPosition() {
 void Drive::ResetPosition() {
     leftZeroPos = m_leftFrontMotor->GetEncoder().GetPosition();
     rightZeroPos = m_rightFrontMotor->GetEncoder().GetPosition();
+    leftSetpoint = leftZeroPos;
+    rightSetpoint = rightZeroPos;
+}
+
+void Drive::ConfigPID(rev::CANSparkMax* motor, double kP, double kI, double kD) {
+    auto motorPIDController = motor->GetPIDController();
+    motorPIDController.SetP(kP);
+    motorPIDController.SetI(kI);
+    motorPIDController.SetD(kD);
+}
+
+void Drive::SetDistance(double leftDist, double rightDist) {
+    // Make sure this is only called once, at the beginning when you set the setpoint
+    // If it is called while the robot should be driving to the setpoint, the call to GetPosition will continually change the setpoint
+
+    // might have to multiply by a conversion factor
+    leftSetpoint = leftDist + GetLeftPosition();
+    rightSetpoint = rightDist + GetRightPosition();
+    m_leftFrontMotor->GetEncoder().SetPosition(leftSetpoint);
+    m_rightRearMotor->GetEncoder().SetPosition(rightSetpoint);
+}
+
+bool Drive::AtSetpoint() {
+    if (std::abs(GetLeftPosition() - leftSetpoint) > kDrivePosThreshold) {
+        return false;
+    } else if (std::abs(GetRightPosition() - rightSetpoint) > kDrivePosThreshold) {
+        return false;
+    }
+    return true;
 }

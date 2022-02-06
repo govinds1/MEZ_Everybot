@@ -29,8 +29,9 @@ void Auton::Init() {
             m_autonSelectedNumber++;
         }
     }
+    stateStartPos = m_drive->GetPosition();
     currentState = 0;
-    stateStart = GetTime();
+    stateStartTime = GetTime();
 }
 
 void Auton::Periodic() {
@@ -41,7 +42,7 @@ void Auton::Periodic() {
             Idle_Auton();
             break;
         case 1:
-            Taxi_Auton();
+            Taxi_Auton_Timed();
             break;
         case 2:
             DumpAndTaxi_Auton();
@@ -59,7 +60,8 @@ double Auton::GetTime() {
 
 void Auton::GoToNextState() {
     m_drive->ResetPosition();
-    stateStart = 0.0;
+    stateStartTime = 0.0;
+    stateStartPos = m_drive->GetPosition();
     currentState++;
 }
 
@@ -79,17 +81,59 @@ void Auton::Idle_Auton() {
     StopSubsystems(true, true, true);
 }
 
-void Auton::Taxi_Auton() {
+
+// three implementations of a simple taxi auton
+// one time based, one with PID control, one with simple driving and encoder checks
+
+void Auton::Taxi_Auton_Timed() {
     switch(currentState) {
         case 0: // Drive backwards
             m_drive->ArcadeDrive(-0.5, 0);
             StopSubsystems(false, true, true);
-            // use distance checks with the drive encoders, but using Timer for now
-            if (GetTime() - stateStart >= 5.0) {
+            if (GetTime() - stateStartTime >= 5.0) {
                 GoToNextState();
             }
             break;
-        case 1: // Stop all motors
+        case 2: // Stop all motors
+            StopSubsystems(true, true, true);
+            break;
+        default:
+            StopSubsystems(true, true, true);
+            break;
+    }
+}
+
+void Auton::Taxi_Auton_PID() {
+    switch(currentState) {
+        case 0: // Set drive setpoint
+            m_drive->SetDistance(-5, -5);
+            GoToNextState();
+            break;
+        case 1: // Check if AtSetpoint
+            if (m_drive->AtSetpoint()) {
+                GoToNextState();
+            }
+            StopSubsystems(false, true, true);
+            break;
+        case 2: // Stop all motors
+            StopSubsystems(true, true, true);
+            break;
+        default:
+            StopSubsystems(true, true, true);
+            break;
+    }
+}
+
+void Auton::Taxi_Auton_DistCheck() {
+    switch(currentState) {
+        case 0: // Drive backwards
+            m_drive->ArcadeDrive(-0.5, 0);
+            StopSubsystems(false, true, true);
+            if (std::abs(m_drive->GetPosition() - stateStartPos) >= 5.0) {
+                GoToNextState();
+            }
+            break;
+        case 2: // Stop all motors
             StopSubsystems(true, true, true);
             break;
         default:
@@ -103,7 +147,7 @@ void Auton::DumpAndTaxi_Auton() {
         case 0: // Dump ball
             m_intake->IntakeDump();
             StopSubsystems(true, true, false);
-            if (GetTime() - stateStart >= 3) {
+            if (GetTime() - stateStartTime >= 3) {
                 GoToNextState();
             }
             break;
@@ -112,7 +156,7 @@ void Auton::DumpAndTaxi_Auton() {
             StopSubsystems(false, true, true);
 
             // use distance checks with the drive encoders, but using Timer for now
-            if (GetTime() - stateStart >= 5.0) {
+            if (GetTime() - stateStartTime >= 5.0) {
                 GoToNextState();
             }
             break;

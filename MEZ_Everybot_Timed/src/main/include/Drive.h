@@ -18,6 +18,8 @@ class Drive {
 
     double leftZeroPos;
     double rightZeroPos;
+    double leftSetpoint;
+    double rightSetpoint;
 
     void Init();
     void Periodic();
@@ -27,4 +29,9 @@ class Drive {
     double GetLeftPosition();
     double GetRightPosition();
     void ResetPosition();
+    void ConfigPID(rev::CANSparkMax* motor, double kP, double kI, double kD);
+    void SetDistance(double leftDist, double rightDist);
+    bool AtSetpoint();
+
+    const double kDrivePosThreshold = 0.1;
 };

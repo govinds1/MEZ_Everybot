@@ -6,6 +6,9 @@ Intake::Intake() {
 
     m_armMotor->SetIdleMode(rev::CANSparkMax::IdleMode::kBrake);
     m_armMotor->SetInverted(false);
+    m_armMotor->SetOpenLoopRampRate(0.2);
+    m_armMotor->SetClosedLoopRampRate(0.2);
+
     m_intakeMotor->SetInverted(false);
 
     ArmConfigPID(0.0, 0.0, 0.0);
@@ -50,6 +53,7 @@ void Intake::ArmUp() {
     // use setpoints if possible, otherwise just Set(arm speed)
     // set position setpoint to be some predetermined encoder value for up
     //m_armEncoder.SetPosition(armUpPos);
+    holding = false;
 
     m_armMotor->Set(MOTOR_SPEEDS::ARM_SPEED);
 
@@ -59,6 +63,7 @@ void Intake::ArmDown() {
     // use setpoints if possible, otherwise just Set(-arm speed)
     // set position setpoint to be some predetermined encoder value for down
     //m_armEncoder.SetPosition(armDownPos);
+    holding = false;
 
     m_armMotor->Set(-MOTOR_SPEEDS::ARM_SPEED);
 }
@@ -76,10 +81,10 @@ void Intake::ArmHold() {
 }
 
 void Intake::ArmConfigPID(double kP, double kI, double kD) {
-    auto m_armPIDController = m_armMotor->GetPIDController();
-    m_armPIDController.SetP(kP);
-    m_armPIDController.SetI(kI);
-    m_armPIDController.SetD(kD);
+    auto armPIDController = m_armMotor->GetPIDController();
+    armPIDController.SetP(kP);
+    armPIDController.SetI(kI);
+    armPIDController.SetD(kD);
 }
 
 double Intake::GetArmPosition() {

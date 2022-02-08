@@ -73,10 +73,9 @@ void Intake::ArmHold() {
     // for hold setpoint, just get current encoder value and set that as position setpoint
     // if (!holding) {
     //     holdPos = GetArmPosition();
-    //     holding = true;
     // }
     // SetArmPosition(holdPos);
-
+    holding = true;
     m_armMotor->Set(0);
 }
 

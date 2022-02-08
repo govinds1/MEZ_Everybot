@@ -14,4 +14,8 @@ class Teleop {
 
     void Init();
     void Periodic();
+    void SetDriveMult();
+
+    private:
+    double driveMult;
 };

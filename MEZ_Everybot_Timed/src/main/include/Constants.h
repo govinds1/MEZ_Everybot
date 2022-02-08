@@ -1,5 +1,7 @@
 #pragma once
 
+#include <frc/XboxController.h>
+
 namespace CAN_IDs {
     static constexpr int LEFTFRONT_MOTOR = 0;
     static constexpr int LEFTREAR_MOTOR = 1;
@@ -18,5 +20,4 @@ namespace MOTOR_SPEEDS {
 namespace CONTROLLER_CONFIG {
     static constexpr int CONTROLLER1_PORT = 0;
     static constexpr int CONTROLLER2_PORT = 1;
-    // add buttons?
 }

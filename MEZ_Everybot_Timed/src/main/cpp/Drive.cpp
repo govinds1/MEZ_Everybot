@@ -2,18 +2,10 @@
 #include <math.h>
 
 Drive::Drive() {
-    
-    // m_leftFrontMotor = new rev::CANSparkMax(CAN_IDs::LEFTFRONT_MOTOR, rev::CANSparkMaxLowLevel::MotorType::kBrushless);
-    // m_leftRearMotor = new rev::CANSparkMax(CAN_IDs::LEFTREAR_MOTOR, rev::CANSparkMaxLowLevel::MotorType::kBrushless);
-    // m_rightFrontMotor = new rev::CANSparkMax(CAN_IDs::RIGHTFRONT_MOTOR, rev::CANSparkMaxLowLevel::MotorType::kBrushless);
-    // m_rightRearMotor = new rev::CANSparkMax(CAN_IDs::RIGHTREAR_MOTOR, rev::CANSparkMaxLowLevel::MotorType::kBrushless);
-    //m_leftThirdMotor = new rev::CANSparkMax(CAN_IDs::LEFTTHIRD_MOTOR, rev::CANSparkMaxLowLevel::MotorType::kBrushless);
-    //m_rightThirdMotor = new rev::CANSparkMax(CAN_IDs::RIGHTTHIRD_MOTOR, rev::CANSparkMaxLowLevel::MotorType::kBrushless);
-
     m_leftRearMotor.Follow(m_leftFrontMotor);
     m_rightRearMotor.Follow(m_rightFrontMotor);
-    //m_leftThirdMotor.Follow(*m_leftFrontMotor);
-    //m_rightThirdMotor.Follow(*m_rightFrontMotor);
+    //m_leftThirdMotor.Follow(m_leftFrontMotor);
+    //m_rightThirdMotor.Follow(m_rightFrontMotor);
 
     m_leftFrontMotor.SetInverted(false);
     m_leftRearMotor.SetInverted(false);

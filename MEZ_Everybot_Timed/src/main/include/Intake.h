@@ -33,7 +33,6 @@ class Intake {
     double holdPos = 0;
     double startPos;
 
-    const double armUpPos = 0; // CHANGE FROM TESTING
-    const double armDownPos = 0; // CHANGE FROM TESTING
+    const double armDownPos = 0; // CHANGE FROM TESTING - encoder count when arm is down
     
 };

@@ -30,6 +30,7 @@ void Auton::Init() {
         }
     }
     stateStartPos = m_drive->GetPosition();
+    stateStartAngle = m_drive->GetAngle();
     currentState = 0;
     stateStartTime = GetTime();
 }
@@ -42,10 +43,13 @@ void Auton::Periodic() {
             Idle_Auton();
             break;
         case 1:
-            Taxi_Auton_Timed();
+            Taxi_Auton_DistCheck();
             break;
         case 2:
             DumpAndTaxi_Auton();
+            break;
+        case 3:
+            GrabAndDumpTwo();
             break;
         default:
             m_autonSelectedNumber = 0;
@@ -60,8 +64,9 @@ double Auton::GetTime() {
 
 void Auton::GoToNextState() {
     m_drive->ResetPosition();
-    stateStartTime = 0.0;
+    stateStartTime = GetTime();
     stateStartPos = m_drive->GetPosition();
+    stateStartAngle = m_drive->GetAngle();
     currentState++;
 }
 
@@ -163,6 +168,47 @@ void Auton::DumpAndTaxi_Auton() {
         case 2: // Stop all motors
             StopSubsystems(true, true, true);
             break;
+        default:
+            StopSubsystems(true, true, true);
+            break;
+    }
+}
+
+void Auton::GrabAndDumpTwo() {
+    // START FACING BALL TO PICK UP
+    switch (currentState)
+    {
+        case 0: // Move arm down and run intake while driving forwards
+            m_drive->ArcadeDrive(0.5, 0);
+            m_intake->ArmDown();
+            m_intake->IntakeGrab();
+            StopSubsystems(false, false, false);
+            if (m_drive->GetPosition() - stateStartPos >= 5) {
+                GoToNextState();
+            }
+            break;
+        case 1: // Turn 180 degrees
+            m_drive->ArcadeDrive(0, -0.5);
+            StopSubsystems(false, true, true);
+            if (std::abs(m_drive->GetAngle() - stateStartAngle) <= 2) {
+                GoToNextState();
+            }
+            break;
+        case 2: // Drive forwards and arm up
+            m_drive->ArcadeDrive(0.5, 0);
+            m_intake->ArmUp();
+            StopSubsystems(false, false, true);
+            if (m_drive->GetPosition() - stateStartPos >= 7) {
+                GoToNextState();
+            }
+        case 3:
+            m_intake->IntakeDump();
+            StopSubsystems(true, true, false);
+            if (GetTime() - stateStartTime >= 5) {
+                GoToNextState();
+            }
+        case 4:
+            StopSubsystems(true, true, true);
         default:
             StopSubsystems(true, true, true);
             break;

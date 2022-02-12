@@ -28,10 +28,13 @@ class Drive {
     double GetPosition();
     double GetLeftPosition();
     double GetRightPosition();
+    double GetAngle();
     void ResetPosition();
     void ConfigPID(rev::CANSparkMax* motor, double kP, double kI, double kD);
     void SetDistance(double leftDist, double rightDist);
     bool AtSetpoint();
 
     const double kDrivePosThreshold = 0.1;
+    const double kEncConvFactor = M_PI*0.5/5.95;
+    const double kDriveBaseWidth = 1.75;
 };

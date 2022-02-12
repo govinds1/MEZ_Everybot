@@ -21,6 +21,7 @@ class Auton {
     void Taxi_Auton_PID();
     void Taxi_Auton_DistCheck();
     void DumpAndTaxi_Auton();
+    void GrabAndDumpTwo();
     // add more
 
     Drive* m_drive;
@@ -37,8 +38,9 @@ class Auton {
     int currentState;
     double stateStartTime;
     double stateStartPos;
+    double stateStartAngle;
     frc::Timer timer;
 
     // Update this vector when you add more routines
-    const std::vector<std::string> kAutoNames{"Idle", "Taxi", "DumpAndTaxi"};
+    const std::vector<std::string> kAutoNames{"Idle", "Taxi", "DumpAndTaxi", "GrabAndDumpTwo"};
 };

@@ -1,4 +1,5 @@
 #include "Drive.h"
+#include <math.h>
 
 Drive::Drive() {
     // MEZ Everybot uses NEOs on the drivetrain
@@ -23,8 +24,8 @@ Drive::Drive() {
     m_drivebase = new frc::DifferentialDrive(*m_leftFrontMotor, *m_rightFrontMotor);
 
     // use counts per revolution and the wheel circumference to get conversion factor from encoder units to feet
-    m_leftFrontMotor->GetEncoder().SetPositionConversionFactor(1.0);
-    m_rightFrontMotor->GetEncoder().SetPositionConversionFactor(1.0);
+    m_leftFrontMotor->GetEncoder().SetPositionConversionFactor(kEncConvFactor);
+    m_rightFrontMotor->GetEncoder().SetPositionConversionFactor(kEncConvFactor);
 
     ConfigPID(m_leftFrontMotor, 0.0, 0.0, 0.0);
     ConfigPID(m_rightFrontMotor, 0.0, 0.0, 0.0);
@@ -34,6 +35,7 @@ Drive::Drive() {
     frc::SmartDashboard::PutNumber("Subsystems/Drive/Left/Position", GetLeftPosition());
     frc::SmartDashboard::PutNumber("Subsystems/Drive/Right/Position", GetRightPosition());
     frc::SmartDashboard::PutNumber("Subsystems/Drive/Position", GetPosition());
+    frc::SmartDashboard::PutNumber("Subsystems/Drive/Angle", GetAngle());
 }
 
 void Drive::Init() {
@@ -45,6 +47,7 @@ void Drive::Periodic() {
     frc::SmartDashboard::PutNumber("Subsystems/Drive/Left/Position", GetLeftPosition());
     frc::SmartDashboard::PutNumber("Subsystems/Drive/Right/Position", GetRightPosition());
     frc::SmartDashboard::PutNumber("Subsystems/Drive/Position", GetPosition());
+    frc::SmartDashboard::PutNumber("Subsystems/Drive/Angle", GetAngle());
 }
 
 void Drive::TankDrive(double left, double right) {
@@ -66,6 +69,10 @@ double Drive::GetLeftPosition() {
 
 double Drive::GetRightPosition() {
     return m_rightFrontMotor->GetEncoder().GetPosition() - rightZeroPos;
+}
+
+double Drive::GetAngle() {
+    return (((GetRightPosition() - GetLeftPosition()) / kDriveBaseWidth)/M_PI)*180.0;
 }
 
 void Drive::ResetPosition() {

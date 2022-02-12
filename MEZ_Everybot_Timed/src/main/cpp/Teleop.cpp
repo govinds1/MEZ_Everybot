@@ -18,7 +18,7 @@ void Teleop::Periodic() {
 
     // drive
     SetDriveMult();
-    m_drive->ArcadeDrive(m_controller1->GetLeftY()*driveMult, m_controller1->GetLeftX()*driveMult);
+    m_drive->ArcadeDrive(-m_controller1->GetLeftY()*driveMult, m_controller1->GetLeftX()*driveMult);
 
     // intake motor
     if (m_controller1->GetRightBumper()) {

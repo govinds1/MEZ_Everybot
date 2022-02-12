@@ -209,6 +209,7 @@ void Auton::GrabAndDumpTwo() {
             }
         case 4:
             StopSubsystems(true, true, true);
+            break;
         default:
             StopSubsystems(true, true, true);
             break;

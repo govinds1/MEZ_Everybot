@@ -2,33 +2,39 @@
 #include <math.h>
 
 Drive::Drive() {
-    // MEZ Everybot uses NEOs on the drivetrain
-    m_leftFrontMotor = new rev::CANSparkMax(CAN_IDs::LEFTFRONT_MOTOR, rev::CANSparkMaxLowLevel::MotorType::kBrushless);
-    m_leftRearMotor = new rev::CANSparkMax(CAN_IDs::LEFTREAR_MOTOR, rev::CANSparkMaxLowLevel::MotorType::kBrushless);
-    m_rightFrontMotor = new rev::CANSparkMax(CAN_IDs::RIGHTFRONT_MOTOR, rev::CANSparkMaxLowLevel::MotorType::kBrushless);
-    m_rightRearMotor = new rev::CANSparkMax(CAN_IDs::RIGHTREAR_MOTOR, rev::CANSparkMaxLowLevel::MotorType::kBrushless);
+    
+    // m_leftFrontMotor = new rev::CANSparkMax(CAN_IDs::LEFTFRONT_MOTOR, rev::CANSparkMaxLowLevel::MotorType::kBrushless);
+    // m_leftRearMotor = new rev::CANSparkMax(CAN_IDs::LEFTREAR_MOTOR, rev::CANSparkMaxLowLevel::MotorType::kBrushless);
+    // m_rightFrontMotor = new rev::CANSparkMax(CAN_IDs::RIGHTFRONT_MOTOR, rev::CANSparkMaxLowLevel::MotorType::kBrushless);
+    // m_rightRearMotor = new rev::CANSparkMax(CAN_IDs::RIGHTREAR_MOTOR, rev::CANSparkMaxLowLevel::MotorType::kBrushless);
+    //m_leftThirdMotor = new rev::CANSparkMax(CAN_IDs::LEFTTHIRD_MOTOR, rev::CANSparkMaxLowLevel::MotorType::kBrushless);
+    //m_rightThirdMotor = new rev::CANSparkMax(CAN_IDs::RIGHTTHIRD_MOTOR, rev::CANSparkMaxLowLevel::MotorType::kBrushless);
 
-    m_leftRearMotor->Follow(*m_leftFrontMotor);
-    m_rightRearMotor->Follow(*m_rightFrontMotor);
+    m_leftRearMotor.Follow(m_leftFrontMotor);
+    m_rightRearMotor.Follow(m_rightFrontMotor);
+    //m_leftThirdMotor.Follow(*m_leftFrontMotor);
+    //m_rightThirdMotor.Follow(*m_rightFrontMotor);
 
-    m_leftFrontMotor->SetInverted(false);
-    m_leftRearMotor->SetInverted(false);
-    m_rightFrontMotor->SetInverted(false);
-    m_rightRearMotor->SetInverted(false);
+    m_leftFrontMotor.SetInverted(false);
+    m_leftRearMotor.SetInverted(false);
+    m_rightFrontMotor.SetInverted(false);
+    m_rightRearMotor.SetInverted(false);
+    //m_leftThirdMotor.SetInverted(false);
+    //m_rightThirdMotor.SetInverted(false);
 
-    m_leftFrontMotor->SetOpenLoopRampRate(0.2);
-    m_leftRearMotor->SetOpenLoopRampRate(0.2);
-    m_rightFrontMotor->SetOpenLoopRampRate(0.2);
-    m_rightRearMotor->SetOpenLoopRampRate(0.2);
+    m_leftFrontMotor.SetOpenLoopRampRate(0.2);
+    m_leftRearMotor.SetOpenLoopRampRate(0.2);
+    m_rightFrontMotor.SetOpenLoopRampRate(0.2);
+    m_rightRearMotor.SetOpenLoopRampRate(0.2);
 
-    m_drivebase = new frc::DifferentialDrive(*m_leftFrontMotor, *m_rightFrontMotor);
+    m_drivebase = new frc::DifferentialDrive(m_leftFrontMotor, m_rightFrontMotor);
 
     // use counts per revolution and the wheel circumference to get conversion factor from encoder units to feet
-    m_leftFrontMotor->GetEncoder().SetPositionConversionFactor(kEncConvFactor);
-    m_rightFrontMotor->GetEncoder().SetPositionConversionFactor(kEncConvFactor);
+    m_leftEnc.SetPositionConversionFactor(kEncConvFactor);
+    m_rightEnc.SetPositionConversionFactor(kEncConvFactor);
 
-    ConfigPID(m_leftFrontMotor, 0.0, 0.0, 0.0);
-    ConfigPID(m_rightFrontMotor, 0.0, 0.0, 0.0);
+    ConfigPID(&m_leftFrontMotor, 0.0, 0.0, 0.0);
+    ConfigPID(&m_rightFrontMotor, 0.0, 0.0, 0.0);
 
     ResetPosition();
 
@@ -64,11 +70,11 @@ double Drive::GetPosition() {
 }
 
 double Drive::GetLeftPosition() {
-    return m_leftFrontMotor->GetEncoder().GetPosition() - leftZeroPos;
+    return m_leftEnc.GetPosition() - leftZeroPos;
 }
 
 double Drive::GetRightPosition() {
-    return m_rightFrontMotor->GetEncoder().GetPosition() - rightZeroPos;
+    return m_rightEnc.GetPosition() - rightZeroPos;
 }
 
 double Drive::GetAngle() {
@@ -76,8 +82,8 @@ double Drive::GetAngle() {
 }
 
 void Drive::ResetPosition() {
-    leftZeroPos = m_leftFrontMotor->GetEncoder().GetPosition();
-    rightZeroPos = m_rightFrontMotor->GetEncoder().GetPosition();
+    leftZeroPos = m_leftEnc.GetPosition();
+    rightZeroPos = m_rightEnc.GetPosition();
     leftSetpoint = leftZeroPos;
     rightSetpoint = rightZeroPos;
 }
@@ -96,8 +102,8 @@ void Drive::SetDistance(double leftDist, double rightDist) {
     // might have to multiply by a conversion factor
     leftSetpoint = leftDist + GetLeftPosition();
     rightSetpoint = rightDist + GetRightPosition();
-    m_leftFrontMotor->GetEncoder().SetPosition(leftSetpoint);
-    m_rightRearMotor->GetEncoder().SetPosition(rightSetpoint);
+    m_leftEnc.SetPosition(leftSetpoint);
+    m_rightEnc.SetPosition(rightSetpoint);
 }
 
 bool Drive::AtSetpoint() {

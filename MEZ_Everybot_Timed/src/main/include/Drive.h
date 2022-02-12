@@ -1,6 +1,7 @@
 #pragma once
 
 #include "rev/CANSparkMax.h"
+#include "rev/SparkMaxRelativeEncoder.h"
 #include <frc/drive/DifferentialDrive.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 #include "Constants.h"
@@ -9,10 +10,13 @@ class Drive {
     public:
     Drive();
 
-    rev::CANSparkMax* m_leftFrontMotor;
-    rev::CANSparkMax* m_leftRearMotor;
-    rev::CANSparkMax* m_rightFrontMotor;
-    rev::CANSparkMax* m_rightRearMotor;
+    // MEZ Everybot uses NEOs on the drivetrain
+    rev::CANSparkMax m_leftFrontMotor{CAN_IDs::LEFTFRONT_MOTOR, rev::CANSparkMaxLowLevel::MotorType::kBrushless};
+    rev::CANSparkMax m_leftRearMotor{CAN_IDs::LEFTREAR_MOTOR, rev::CANSparkMaxLowLevel::MotorType::kBrushless};
+    rev::CANSparkMax m_rightFrontMotor{CAN_IDs::RIGHTFRONT_MOTOR, rev::CANSparkMaxLowLevel::MotorType::kBrushless};
+    rev::CANSparkMax m_rightRearMotor{CAN_IDs::RIGHTREAR_MOTOR, rev::CANSparkMaxLowLevel::MotorType::kBrushless};
+    // rev::CANSparkMax m_leftThirdMotor{CAN_IDs::LEFTTHIRD_MOTOR, rev::CANSparkMaxLowLevel::MotorType::kBrushless};
+    // rev::CANSparkMax m_rightThirdMotor{CAN_IDs::RIGHTTHIRD_MOTOR, rev::CANSparkMaxLowLevel::MotorType::kBrushless};
 
     frc::DifferentialDrive* m_drivebase;
 
@@ -20,6 +24,8 @@ class Drive {
     double rightZeroPos;
     double leftSetpoint;
     double rightSetpoint;
+    rev::SparkMaxRelativeEncoder m_leftEnc = m_leftFrontMotor.GetEncoder();
+    rev::SparkMaxRelativeEncoder m_rightEnc = m_rightFrontMotor.GetEncoder();
 
     void Init();
     void Periodic();
@@ -35,6 +41,6 @@ class Drive {
     bool AtSetpoint();
 
     const double kDrivePosThreshold = 0.1;
-    const double kEncConvFactor = M_PI*0.5/5.95;
+    const double kEncConvFactor = 42*M_PI*0.5/5.95;
     const double kDriveBaseWidth = 1.75;
 };

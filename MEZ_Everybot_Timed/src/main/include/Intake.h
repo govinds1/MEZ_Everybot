@@ -31,8 +31,8 @@ class Intake {
     private:
     bool holding = false;
     double holdPos = 0;
-    double startPos;
 
+    const double armUpPos = 0; // CHANGE FROM TESTING - encoder count when arm is up
     const double armDownPos = 0; // CHANGE FROM TESTING - encoder count when arm is down
     
 };

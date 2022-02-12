@@ -92,8 +92,8 @@ void Auton::Idle_Auton() {
 
 void Auton::Taxi_Auton_Timed() {
     switch(currentState) {
-        case 0: // Drive backwards
-            m_drive->ArcadeDrive(-0.5, 0);
+        case 0: // Drive forwards
+            m_drive->ArcadeDrive(0.5, 0);
             StopSubsystems(false, true, true);
             if (GetTime() - stateStartTime >= 5.0) {
                 GoToNextState();
@@ -108,31 +108,10 @@ void Auton::Taxi_Auton_Timed() {
     }
 }
 
-void Auton::Taxi_Auton_PID() {
-    switch(currentState) {
-        case 0: // Set drive setpoint
-            m_drive->SetDistance(-5, -5);
-            GoToNextState();
-            break;
-        case 1: // Check if AtSetpoint
-            if (m_drive->AtSetpoint()) {
-                GoToNextState();
-            }
-            StopSubsystems(false, true, true);
-            break;
-        case 2: // Stop all motors
-            StopSubsystems(true, true, true);
-            break;
-        default:
-            StopSubsystems(true, true, true);
-            break;
-    }
-}
-
 void Auton::Taxi_Auton_DistCheck() {
     switch(currentState) {
-        case 0: // Drive backwards
-            m_drive->ArcadeDrive(-0.5, 0);
+        case 0: // Drive forwards
+            m_drive->ArcadeDrive(0.5, 0);
             StopSubsystems(false, true, true);
             if (std::abs(m_drive->GetPosition() - stateStartPos) >= 5.0) {
                 GoToNextState();

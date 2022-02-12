@@ -18,7 +18,6 @@ class Auton {
     // Auton functions
     void Idle_Auton();
     void Taxi_Auton_Timed();
-    void Taxi_Auton_PID();
     void Taxi_Auton_DistCheck();
     void DumpAndTaxi_Auton();
     void GrabAndDumpTwo();

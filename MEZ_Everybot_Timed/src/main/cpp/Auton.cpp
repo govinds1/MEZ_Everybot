@@ -82,6 +82,38 @@ void Auton::StopSubsystems(bool drive, bool arm, bool intake) {
     }
 }
 
+// Think of a straight line as a hypotenuse of a triangle
+// length of the hypotenuse is dist (if dist is negative, robot will drive backwards)
+// angle from hypotenuse to robot x-axis (across width of robot) is angle (between -90 and 90, drive backwards if it's behind)
+// angle between starting angle and the angle you want to end at is endAngle (This is like an angle displacement)
+bool Auton::DriveToPoint(double dist, double angle, double endAngle) {
+    dist = dist + stateStartPos;
+    angle = angle + stateStartAngle;
+    endAngle = endAngle + stateStartAngle;
+    double angleError = angle - m_drive->GetAngle();
+    double distError = dist - m_drive->GetPosition();
+    double rot, speed;
+    bool angleDone = false;
+    bool distDone = false;
+    if (std::abs(distError) <= 0.5) {
+        speed = 0.0;
+        angleError = endAngle - m_drive->GetAngle();
+        distDone = true;
+    } else {
+        speed = std::pow(std::abs(distError / 10.0), 0.33) * 0.9;
+        speed = (distError < 0) ? -speed : speed;
+    }
+    if (std::abs(angleError) <= 2.0) {
+        rot = 0.0;
+        angleDone = true;
+    } else {
+        rot = std::pow(std::abs(angleError / 90.0), 0.33) * 0.4;
+        rot = (angleError < 0) ? -rot : rot;
+    }
+    m_drive->ArcadeDrive(speed, rot);
+    return (angleDone && distDone);
+}
+
 void Auton::Idle_Auton() {
     StopSubsystems(true, true, true);
 }
@@ -192,5 +224,29 @@ void Auton::GrabAndDumpTwo() {
         default:
             StopSubsystems(true, true, true);
             break;
+    }
+}
+
+void Auton::CurveTest() {
+    switch (currentState)
+    {
+    case 0:
+        StopSubsystems(false, true, true);
+        if (DriveToPoint(8, 30, 0)) {
+            GoToNextState();
+        }
+        break;
+    case 1:
+        StopSubsystems(false, true, true);
+        if (DriveToPoint(-5, 45, -90)) {
+            GoToNextState();
+        }
+        break;
+    case 2:
+        StopSubsystems(true, true, true);
+        break;
+    default:
+        StopSubsystems(true, true, true);
+        break;
     }
 }

@@ -69,6 +69,7 @@ double Drive::GetRightPosition() {
     return m_rightEnc.GetPosition() - rightZeroPos;
 }
 
+// RETURNS IN DEGREES
 double Drive::GetAngle() {
     return (((GetRightPosition() - GetLeftPosition()) / kDriveBaseWidth)/M_PI)*180.0;
 }

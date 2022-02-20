@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <math.h>
 #include <vector>
 #include "Drive.h"
 #include "Intake.h"
@@ -21,6 +22,7 @@ class Auton {
     void Taxi_Auton_DistCheck();
     void DumpAndTaxi_Auton();
     void GrabAndDumpTwo();
+    void CurveTest();
     // add more
 
     Drive* m_drive;
@@ -29,6 +31,7 @@ class Auton {
     double GetTime();
     void GoToNextState();
     void StopSubsystems(bool drive, bool arm, bool intake);
+    bool DriveToPoint(double dist, double angle, double endAngle);
 
     private:
     //frc::SendableChooser<std::string> m_chooser;

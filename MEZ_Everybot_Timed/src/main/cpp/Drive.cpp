@@ -22,8 +22,10 @@ Drive::Drive() {
     m_drivebase = new frc::DifferentialDrive(m_leftFrontMotor, m_rightFrontMotor);
 
     // use counts per revolution and the wheel circumference to get conversion factor from encoder units to feet
-    m_leftEnc.SetPositionConversionFactor(kEncConvFactor);
-    m_rightEnc.SetPositionConversionFactor(kEncConvFactor);
+    m_leftEnc.SetPositionConversionFactor(kEncPosConvFactor);
+    m_rightEnc.SetPositionConversionFactor(kEncPosConvFactor);
+    m_leftEnc.SetVelocityConversionFactor(kEncVelConvFactor);
+    m_rightEnc.SetVelocityConversionFactor(kEncVelConvFactor);
 
     ConfigPID(&m_leftFrontMotor, 0.0, 0.0, 0.0);
     ConfigPID(&m_rightFrontMotor, 0.0, 0.0, 0.0);
@@ -34,6 +36,8 @@ Drive::Drive() {
     frc::SmartDashboard::PutNumber("Subsystems/Drive/Right/Position", GetRightPosition());
     frc::SmartDashboard::PutNumber("Subsystems/Drive/Position", GetPosition());
     frc::SmartDashboard::PutNumber("Subsystems/Drive/Angle", GetAngle());
+    frc::SmartDashboard::PutNumber("Subsystems/Drive/Left/Setpoint", leftSetpoint);
+    frc::SmartDashboard::PutNumber("Subsystems/Drive/Right/Setpoint", rightSetpoint);
 }
 
 void Drive::Init() {
@@ -46,6 +50,8 @@ void Drive::Periodic() {
     frc::SmartDashboard::PutNumber("Subsystems/Drive/Right/Position", GetRightPosition());
     frc::SmartDashboard::PutNumber("Subsystems/Drive/Position", GetPosition());
     frc::SmartDashboard::PutNumber("Subsystems/Drive/Angle", GetAngle());
+    frc::SmartDashboard::PutNumber("Subsystems/Drive/Left/Setpoint", leftSetpoint);
+    frc::SmartDashboard::PutNumber("Subsystems/Drive/Right/Setpoint", rightSetpoint);
 }
 
 void Drive::TankDrive(double left, double right) {
@@ -62,11 +68,11 @@ double Drive::GetPosition() {
 }
 
 double Drive::GetLeftPosition() {
-    return m_leftEnc.GetPosition() - leftZeroPos;
+    return m_leftEnc.GetPosition();
 }
 
 double Drive::GetRightPosition() {
-    return m_rightEnc.GetPosition() - rightZeroPos;
+    return m_rightEnc.GetPosition();
 }
 
 // RETURNS IN DEGREES
@@ -75,10 +81,10 @@ double Drive::GetAngle() {
 }
 
 void Drive::ResetPosition() {
-    leftZeroPos = m_leftEnc.GetPosition();
-    rightZeroPos = m_rightEnc.GetPosition();
-    leftSetpoint = leftZeroPos;
-    rightSetpoint = rightZeroPos;
+    m_leftEnc.SetPosition(0.0);
+    m_rightEnc.SetPosition(0.0);
+    leftSetpoint = 0.0;
+    rightSetpoint = 0.0;
 }
 
 void Drive::ConfigPID(rev::CANSparkMax* motor, double kP, double kI, double kD) {
@@ -95,8 +101,8 @@ void Drive::SetDistance(double leftDist, double rightDist) {
     // might have to multiply by a conversion factor
     leftSetpoint = leftDist + GetLeftPosition();
     rightSetpoint = rightDist + GetRightPosition();
-    m_leftEnc.SetPosition(leftSetpoint);
-    m_rightEnc.SetPosition(rightSetpoint);
+    m_leftFrontMotor.GetPIDController().SetReference(leftSetpoint, rev::ControlType::kPosition);
+    m_rightFrontMotor.GetPIDController().SetReference(rightSetpoint, rev::ControlType::kPosition);
 }
 
 bool Drive::AtSetpoint() {

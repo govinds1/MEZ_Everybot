@@ -20,8 +20,8 @@ class Drive {
 
     frc::DifferentialDrive* m_drivebase;
 
-    double leftZeroPos;
-    double rightZeroPos;
+    // double leftZeroPos;
+    // double rightZeroPos;
     double leftSetpoint;
     double rightSetpoint;
     rev::SparkMaxRelativeEncoder m_leftEnc = m_leftFrontMotor.GetEncoder();
@@ -41,6 +41,7 @@ class Drive {
     bool AtSetpoint();
 
     const double kDrivePosThreshold = 0.1;
-    const double kEncConvFactor = 42*M_PI*0.5/5.95;
+    const double kEncPosConvFactor = 1/(42*M_PI*0.5/5.95); // reciprocal of counts per rev * gear ratio * pi * wheel diameter
+    const double kEncVelConvFactor = kEncPosConvFactor/60; // counts to feet, then divide by 60 to get from per minute to per second
     const double kDriveBaseWidth = 1.75;
 };
